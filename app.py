@@ -1,6 +1,6 @@
 from fastapi import *
 from fastapi.responses import FileResponse
-app=fastapi()
+app=FastAPI()
 
 # Static Pages (Never Modify Code in this Block)
 @app.get("/", include_in_schema=False)
