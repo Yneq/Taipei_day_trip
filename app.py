@@ -38,20 +38,40 @@ def attractions(page: int=Query(0, ge=0), keyword: str=None):
 		cursor = db.cursor(dictionary=True)
 
 		if keyword:
-			sql = "SELECT * FROM attractions WHERE name LIKE %s LIMIT %s, 12"
-			count_sql = "SELECT COUNT(*) as total FROM attractions WHERE name LIKE %s"
+			sql = """
+            SELECT * FROM attractions 
+            WHERE 
+                name LIKE %s OR 
+                category LIKE %s OR 
+                description LIKE %s OR 
+                address LIKE %s OR 
+                transport LIKE %s OR 
+                mrt LIKE %s 
+            LIMIT %s, 12
+            """
+			count_sql = """
+            SELECT COUNT(*) as total FROM attractions 
+            WHERE 
+                name LIKE %s OR 
+                category LIKE %s OR 
+                description LIKE %s OR 
+                address LIKE %s OR 
+                transport LIKE %s OR 
+                mrt LIKE %s
+            """
 			
-			cursor.execute(count_sql, ('%' + keyword + '%',))
+			like_keyword = '%' + keyword + '%'
+			cursor.execute(count_sql, (like_keyword, like_keyword, like_keyword, like_keyword, like_keyword, like_keyword))
 			total_records = cursor.fetchone()["total"]
-
-			cursor.execute(sql, ('%' + keyword + '%', page * 12))
+			
+			cursor.execute(sql, (like_keyword, like_keyword, like_keyword, like_keyword, like_keyword, like_keyword, page * 12))
 		else:
 			sql = "SELECT * FROM attractions LIMIT %s, 12"
 			count_sql = "SELECT COUNT(*) as total FROM attractions"
 			
 			cursor.execute(count_sql)
 			total_records = cursor.fetchone()["total"]
-			
+		
 			cursor.execute(sql, (page * 12,))
 
 		attractions = cursor.fetchall()
