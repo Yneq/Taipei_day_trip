@@ -2,6 +2,7 @@ from fastapi import *
 from fastapi.responses import FileResponse, JSONResponse
 import mysql.connector
 from mysql.connector import Error
+import json
 
 app=FastAPI()
 
@@ -42,10 +43,6 @@ def attractions(page: int=Query(0, ge=0), keyword: str=None):
             SELECT * FROM attractions 
             WHERE 
                 name LIKE %s OR 
-                category LIKE %s OR 
-                description LIKE %s OR 
-                address LIKE %s OR 
-                transport LIKE %s OR 
                 mrt LIKE %s 
             LIMIT %s, 12
             """
@@ -53,18 +50,14 @@ def attractions(page: int=Query(0, ge=0), keyword: str=None):
             SELECT COUNT(*) as total FROM attractions 
             WHERE 
                 name LIKE %s OR 
-                category LIKE %s OR 
-                description LIKE %s OR 
-                address LIKE %s OR 
-                transport LIKE %s OR 
                 mrt LIKE %s
             """
 			
 			like_keyword = '%' + keyword + '%'
-			cursor.execute(count_sql, (like_keyword, like_keyword, like_keyword, like_keyword, like_keyword, like_keyword))
+			cursor.execute(count_sql, (like_keyword, like_keyword))
 			total_records = cursor.fetchone()["total"]
 			
-			cursor.execute(sql, (like_keyword, like_keyword, like_keyword, like_keyword, like_keyword, like_keyword, page * 12))
+			cursor.execute(sql, (like_keyword, like_keyword, page * 12))
 		else:
 			sql = "SELECT * FROM attractions LIMIT %s, 12"
 			count_sql = "SELECT COUNT(*) as total FROM attractions"
@@ -83,6 +76,8 @@ def attractions(page: int=Query(0, ge=0), keyword: str=None):
 			"nextPage": None,
 			"data": []
 			}
+		for attraction in attractions:
+			attraction['images'] = json.loads(attraction['images'])
 			
 		next_page = page + 1 if (page + 1) * 12 < total_records else None
 		return {
@@ -114,7 +109,9 @@ def get_attractionId(attractionId: int):
 				status_code=400,
 		    	content={"error":True, "message": f"景點編號不正確"}
 			)
-		return attraction
+		attraction['images'] = json.loads(attraction['images'])
+		return {"data": attraction}
+	
 	except Error as e:
 		print(f"Database error: {str(e)}")  # 添加這行進行調試
 		return JSONResponse(
