@@ -205,6 +205,13 @@ opacity: 1;
     justify-content: center;
     align-items: center;
     border-radius: 5px;
+    color: rgba(102, 102, 102, 1);
+    transition: color 0.3s ease;
+    cursor: pointer;
+}
+
+.station:hover {
+  color: rgba(0, 0, 0, 1);
 }
 
 .attraction-grid {
