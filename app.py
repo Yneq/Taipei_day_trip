@@ -7,7 +7,6 @@ import json
 
 app=FastAPI()
 
-=======
 from fastapi.staticfiles import StaticFiles
 
 app=FastAPI()

@@ -39,8 +39,11 @@ fetch('http://13.236.156.145:8000/api/mrts')
 
 
 let nextPage = 0;
+let isloading = false;
 
 function fetchAttractions(page, isSearch = false, keyword = '') {
+  if (isloading) return;
+    isloading = true;
     fetch(`http://13.236.156.145:8000/api/attractions?page=${page}&keyword=${keyword}`)
       .then(response => response.json())
       .then(data => {
@@ -85,12 +88,13 @@ function fetchAttractions(page, isSearch = false, keyword = '') {
           
           attractionGrid.appendChild(attractionElement);
 
-
         });
+      isloading = false;
       })
 
       .catch(error => {
         console.error('Error fetching attractions:', error);
+        isloading = false;
       });
 }  
 
