@@ -4,7 +4,29 @@ import mysql.connector
 from mysql.connector import Error
 import json
 
+
 app=FastAPI()
+
+=======
+from fastapi.staticfiles import StaticFiles
+
+app=FastAPI()
+
+# from fastapi.middleware.cors import CORSMiddleware
+# origins = [
+#     "http://localhost",
+#     "http://localhost:8000",
+#     "http://13.236.156.145"
+# ]
+
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=origins, 
+#     allow_credentials=True,
+#     allow_methods=["*"],  
+#     allow_headers=["*"],  
+# )
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Static Pages (Never Modify Code in this Block)
 @app.get("/", include_in_schema=False)

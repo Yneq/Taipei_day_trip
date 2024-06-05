@@ -1,0 +1,482 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}  
+
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+}
+
+.navbar {
+  width: 100%;
+  max-width: 1920px;
+  height: 54px;
+  background-color: rgba(255, 255, 255, 1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.content {
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  width: 150px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; 
+  color: rgba(68, 136, 153, 1);
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.buttons {
+  display: flex;
+  margin-left: auto;
+  height: 34px;
+  color: rgba(102, 102, 102, 1);
+}
+
+.btn {
+  border: 1px solid #ddd;
+  font-size: 16px;
+  width: 84px;
+  cursor: pointer;
+}
+
+.btn:first-child {
+  border-right: none;
+}
+
+.btn:last-child {
+  border-left: none;
+}
+
+.btn:hover {
+  background-color: #81bdd1;
+}
+
+.hero-selection {
+  width: 100%;
+  max-width: 1920px;
+  height: 320px;
+  background-image: url('welcome.png');
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  gap: 10px;
+
+}
+
+.hero-content {
+  width: 100%;
+  max-width: 1200px;
+  height: 169px;
+}
+
+.hero-content h1 {
+  font-size: 28px;
+  color: white;
+}
+
+.subtext {
+  color: white;
+  max-width:1200px;
+  height: 22px;
+  gap: 0px;
+  opacity: 1;
+  font-size: 18px;
+}
+
+.search-bar {
+  display: flex;
+  margin-top: 25px;
+}
+
+.search-bar input {
+  width: 400px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.search-btn {
+  width: 60px;
+  height: 46px;
+  background-color:rgba(170, 187, 204, 1);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-image: url('btn.png');
+  background-size: cover;
+}
+
+.search-btn img {
+  width: 60px;
+  height: 46px;
+}
+
+.list-bar {
+  width: 100%;
+  max-width: 1200px;
+  height: 70px;
+  padding: 0 0 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px auto;
+  overflow: hidden;
+}
+
+.arrow-left, .arrow-right {
+  width: 47px; 
+  height: 50px; 
+  padding: 9px 0px 9px 15px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  background-size: 32px 32px; 
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.5; 
+  transition: opacity 0.3s ease; 
+}
+
+.arrow-left:hover, .arrow-right:hover {
+opacity: 1; 
+}
+
+.arrow-left {
+  background-image: url('left.png');
+}
+
+.arrow-right {
+  background-image: url('right.png');
+}
+
+.station-container {
+  width: 100%;
+  max-width: 1106px;
+  display: flex;
+  overflow: hidden;
+}
+  
+.stations {
+    display: flex;
+    transition: transform 0.3s ease;
+    overflow-x: scroll;
+    scroll-behavior: smooth; 
+}
+
+.stations::-webkit-scrollbar {
+  display: none;  /* 隱藏滾動條 */
+}
+  
+.station {
+    flex: 0 0 auto;
+    width: auto;
+    height: 24px;
+    padding: 5px 15px;
+    margin-right: 4px;
+    white-space: nowrap;
+    background-color: #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+}
+
+.attraction-grid {
+  width: 100%;
+  max-width: 1200px;
+  padding: 15px 0 0 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 30px;
+  margin: 0 auto;
+}
+
+.attraction {
+  width: 270px;
+  height: 242px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+  overflow: hidden;
+  position: relative;
+}
+
+.attraction img {
+  width: 100%;
+  height: 197px;
+  object-fit: cover;
+  position: relative;
+}
+
+.attraction .info {
+  width: 100%;  
+  height: 40px;
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: absolute;
+  bottom: 45px;
+  left: 0;
+  background-color: rgb(25, 23, 23, 0.7);
+  color: rgba(255, 255, 255, 1);
+  z-index: 1;
+}
+
+.attraction .info span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attraction .category {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 1;
+  color: rgba(117, 117, 117, 1);
+}
+.attraction .bottom-bar {
+  width: 100%;  
+  height: 45px;
+  padding: 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  z-index: 1;
+  color: rgba(117, 117, 117, 1);
+}
+
+.copyright-bar {
+  width: 100%;
+  height: 104px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color:rgba(255, 255, 255, 1);
+  background-color:rgba(117, 117, 117, 1);
+  margin-top: 50px;
+  box-sizing: border-box; 
+}
+
+.loader {
+  text-align: center;
+  padding: 20px;
+  display: block;
+}
+
+
+
+
+
+
+
+@media (max-width: 360px) {
+  .navbar, .hero-selection, .list-bar, .attraction-grid {
+      width: 100%;
+      max-width: 360px;
+      padding: 10px;
+  }
+
+
+  .title, .buttons {
+      width: 100%;
+      text-align: left;
+  }
+
+  .buttons {
+      display: flex;
+      width: 100%;
+  }
+
+
+
+
+  .search-bar input {
+    width: calc(100% - 70px);
+    margin-top: 5px;
+  }
+
+  .search-btn {
+    width: 60px;
+    height: 46px;
+    margin-top: 5px;
+  }
+
+  .attraction-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+  }
+
+  .attraction {
+      width: 100%;
+      height: auto;
+  }
+
+  .attraction img {
+      width: 100%;
+  }
+  .attraction .bottom-bar {
+    position: relative;
+    background-color: rgb(255, 255, 255, 0.7);
+  }
+  
+}
+
+@media (min-width: 361px) and (max-width: 1199px) {
+  .navbar, .hero-selection, .list-bar, .attraction-grid {
+      width: 100%;
+      max-width: 1200px;
+      padding: 10px;
+  }
+
+  .content {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+  }
+
+  .title {
+      width: auto;
+  }
+
+  .buttons {
+      width: auto;
+      display: flex;
+      justify-content: flex-end;
+  }
+
+  .search-bar {
+      flex-direction: row;
+  }
+
+  .attraction-grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: auto;
+  }
+
+  .attraction {
+      width: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+  }
+
+  .attraction img {
+      width: 100%;
+      height: auto;
+
+  }
+
+  .attraction .info {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: absolute;
+      bottom: 45px;
+      left: 0;
+      background-color: rgb(25, 23, 23, 0.7);
+      color: rgba(255, 255, 255, 1);
+      z-index: 1;
+  }
+
+  .attraction .info span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+  }
+
+  .attraction .bottom-bar {
+      width: 100%;
+      padding: 0 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: realtive;
+      bottom: 0px;
+      box-sizing: border-box;
+      background-color: rgb(255, 255, 255, 1);
+      color: rgba(117, 117, 117, 1);
+  }
+}
+@media (min-width: 1200px) {
+  .navbar, .hero-selection, .list-bar, .attraction-grid {
+      width: 100%;
+      padding: 15px 0 0 0;
+  }
+
+  .content {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+  }
+
+  .title {
+      width: auto;
+  }
+
+  .buttons {
+      width: auto;
+      display: flex;
+      justify-content: flex-end;
+  }
+
+  .search-bar {
+      flex-direction: row;
+  }
+
+  .attraction-grid {
+      grid-template-columns: repeat(4, 1fr);
+  }
+
+  .attraction {
+      width: 270px;
+      height: 242px;
+  }
+
+  .attraction img {
+      width: 100%;
+      height: 197px;
+  }
+  .attraction .bottom-bar {
+    position: absolute;
+    bottom: 0;
+    background-color: rgb(255, 255, 255, 0.7);
+  }
+}
