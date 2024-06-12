@@ -17,10 +17,36 @@
         <div class="title">台北一日遊</div>
         <div class="buttons">
             <button class="btn">預定行程</button>
-            <button class="btn">登入/註冊</button>
+            <button class="btn" id="loginBtn">登入/註冊</button>
         </div>
     </div>
 </div>
+
+<div class="modal" id="modal-login">
+    <div class="member-top-bar"></div>
+    <div class="modal-content">
+        <span class="close-btn"></span>
+            <div class="log-in">登入會員帳號</div>
+            <input type="email" placeholder="輸入電子信箱" class="input-member">
+            <input type="password" placeholder="輸入密碼" class="input-member">
+            <button class="register-btn">登入帳戶</button>
+        <div class="question">還沒有帳戶？<a href="#" class="question" id="q-login">點此註冊</a></div>  
+    </div>
+</div>
+
+<div class="modal" id="modal-signup">
+    <div class="member-top-bar"></div>
+    <div class="modal-content">
+        <span class="close-btn"></span>
+            <div class="log-in">註冊會員帳號</div>
+            <input type="text" placeholder="輸入姓名" class="input-member">
+            <input type="email" placeholder="輸入電子郵件" class="input-member">
+            <input type="password" placeholder="輸入密碼" class="input-member">
+            <button class="register-btn">註冊新帳戶</button>
+        <div class="question">已經有帳戶了？<a href="#" class="question" id="q-signup">點此登入</a></div>  
+    </div>
+</div>
+
 <div class="hero-selection">
     <div class="hero-content">
         <h1>輕鬆享受台北一日悠閒</h1>
