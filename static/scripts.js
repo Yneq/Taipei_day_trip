@@ -16,7 +16,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
   const afternoonRadio = document.getElementById('afternoon')
   const priceSpan = document.getElementById('price')
   const titleBtn = document.querySelector('.title')
-  
+  const datePicker = document.querySelector('.date-picker')
+  const datePickerFrame = document.querySelector('.date-picker-frame')
 
   if(loginBtn) {
     loginBtn.onclick = function() {
@@ -55,7 +56,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   titleBtn.onclick = function () {
     window.location.href ='http://13.236.156.145:8000/'
-  }
+  };
+
+  datePickerFrame.addEventListener('click', () => {
+    datePicker.showPicker();
+  });
+
+  datePicker.addEventListener('change', (event) => {
+    const selectedDate = event.target.value;
+    console.log(`Date-Choosed:${selectedDate}`);
+  });
 
 
 

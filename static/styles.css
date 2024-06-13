@@ -423,10 +423,10 @@ opacity: 1;
 }
 
 .pictures img {
-  flex-shrink: 0; /* 確保圖片不會縮小 */
+  flex-shrink: 0; 
   width: 100%;
+  object-fit: cover; 
   transition: opacity 1s ease-in-out;
-  opacity: 0;
 }
 
 .pictures img.active {
@@ -491,8 +491,11 @@ opacity: 1;
 
 
 .bookings-content {
-  width: 600px;
+  height: auto;
+  width: 100%;
+  max-width: 600px;
   font-size: 16px;
+  box-sizing: border-box; /* 確保 padding 不影響元素的寬度 */
 }
 
 .attraction-name {
@@ -541,14 +544,28 @@ opacity: 1;
   height: 36px;
 }
 
+.date-picker-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .date-picker {
   height: 35px;
   padding: 5px 30px 5px 5px; 
   border: 0px solid #ccc;
   background: url('/static/icon_calendar.png') no-repeat right 10px center;
-  background-size: 20px 20px;
+  background-size: 24px 24px;
   background-color: rgba(255, 255, 255, 1);
   font-weight: bold;
+  width: 193px;
+}
+
+.date-picker::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 10px;
+  opacity: 0;
+  cursor: pointer; 
 }
 
 input[type="radio"] {
@@ -792,6 +809,7 @@ input[type="radio"]:checked + .radio-label::before {
   gap: 20px;
   color: rgba(102, 102, 102, 1);
   flex-wrap: wrap;
+  
 }
 
 .pictures img {
