@@ -58,14 +58,18 @@ document.addEventListener('DOMContentLoaded', (event) => {
     window.location.href ='http://13.236.156.145:8000/'
   };
 
-  datePickerFrame.addEventListener('click', () => {
-    datePicker.showPicker();
-  });
+  if (datePickerFrame) {
+    datePickerFrame.addEventListener('click', () => {
+      datePicker.showPicker();
+    });
+  }
 
-  datePicker.addEventListener('change', (event) => {
-    const selectedDate = event.target.value;
-    console.log(`Date-Choosed:${selectedDate}`);
-  });
+  if (datePicker) {
+    datePicker.addEventListener('change', (event) => {
+      const selectedDate = event.target.value;
+      console.log(`Date-Choosed: ${selectedDate}`);
+    });
+  }
 
 
 
