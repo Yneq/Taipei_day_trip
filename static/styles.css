@@ -41,8 +41,9 @@ body {
   align-items: center;
   justify-content: flex-start; 
   color: rgba(68, 136, 153, 1);
-  font-size: 24px;
+  font-size: 30px;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .buttons {
@@ -53,7 +54,7 @@ body {
   color: rgba(102, 102, 102, 1);
 }
 
-.btn {
+.booking-btn {
   border: 0px;
   font-size: 16px;
   width: 84px;
@@ -61,17 +62,14 @@ body {
   cursor: pointer;
 }
 
-.btn:first-child {
+.booking-btn:first-child {
   border-right: none;
 }
 
-.btn:last-child {
+.booking-btn:last-child {
   border-left: none;
 }
 
-.btn:hover {
-  background-color: #81bdd1;
-}
 
 .hero-selection {
   width: 100%;
@@ -238,6 +236,7 @@ opacity: 1;
   background-color: #fff;
   overflow: hidden;
   position: relative;
+  cursor: pointer;
 }
 
 .attraction img {
@@ -307,8 +306,18 @@ opacity: 1;
 
 .loader {
   text-align: center;
-  padding: 20px;
   display: block;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  display: none;
 }
 
 .modal {
@@ -427,6 +436,7 @@ opacity: 1;
   width: 100%;
   object-fit: cover; 
   transition: opacity 1s ease-in-out;
+  opacity: 0;
 }
 
 .pictures img.active {
@@ -495,7 +505,7 @@ opacity: 1;
   width: 100%;
   max-width: 600px;
   font-size: 16px;
-  box-sizing: border-box; /* 確保 padding 不影響元素的寬度 */
+  box-sizing: border-box;
 }
 
 .attraction-name {
@@ -534,11 +544,12 @@ opacity: 1;
 .start-booking-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   color: rgba(255, 255, 255, 1);
   background-color: rgba(68, 136, 153, 1);
   border-radius: 5px;
   font-size: 16px;
-  border: solid;
+  border: none;
   padding: 10px 20px;
   width: 154px;
   height: 36px;
@@ -597,9 +608,15 @@ input[type="radio"]:checked + .radio-label::before {
   display: inline-block;
 }
 
+.horizontal-line-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 .horizontal-line {
   border: 1px solid rgba(232, 232, 232, 1);
-  max-width: 1200px;
+  width: 100%;
   margin: 37px auto 50px auto;
 }
 
@@ -617,6 +634,127 @@ input[type="radio"]:checked + .radio-label::before {
   font-weight: bold;
 }
 
+.booking-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  color: rgba(102, 102, 102, 1);
+  margin-bottom: 40px;
+}
+
+.greeting-booking {
+  max-width: 1000px;
+  display: flex;
+  margin-top: 40px;
+  margin-bottom: 30px;
+  font-weight: bold;
+}
+
+.booking-picture-content {
+  display: flex;
+  gap: 22px;
+}
+
+.booking-picture {
+  background-image: url('welcome.png');
+  width:250px;
+  height: 200px;
+  background-size: cover;
+  margin-right: 8px;
+  margin-left: 8px;
+}
+
+.booking-details {
+  max-width: 700px;
+  width: 100%;
+  max-height: 200px;
+  height: auto;
+  position: relative;
+}
+
+.delete-btn {
+  position: absolute;
+  background-image: url('delete.png');
+  background-size: cover;
+  width: 30px;
+  height: 30px;
+  right: 0;
+  top: 0;
+}
+
+.booking-attraction-name {
+  margin-bottom: 20px;
+  color: rgba(68, 136, 153, 1);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-name, .input-mail, .input-number, .credit-card-input, .input-date, .input-cvv {
+  display: block;
+  margin-bottom: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  max-width: 200px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contact-info, .creditcard-info {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  font-size: 19px;
+  font-weight: bold;
+}
+
+.notice {
+  margin-top: 5px;
+  margin-bottom: 40px;
+}
+
+#total-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.confirm-pay {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 1);
+  background-color: rgba(68, 136, 153, 1);
+  border-radius: 5px;
+  font-size: 19px;
+  font-weight: 250;
+  border: none;
+  padding: 10px 20px;
+  width: 173px;
+  height: 36px;
+  margin-top: 22px;
+  margin-bottom: 22px;
+}
+
+.fail-email-password, .fail-email-registed {
+  display: none;
+  margin-bottom: 5px;
+  color: rgb(164, 11, 11);
+}
+
+.success-signup, .success-login{
+  display: none;
+  margin-bottom: 5px;
+  color: rgb(11, 164, 95);
+}
+
+
 
 
 
@@ -632,6 +770,7 @@ input[type="radio"]:checked + .radio-label::before {
   .title, .buttons {
       width: 100%;
       text-align: left;
+      
   }
 
   .buttons {
@@ -800,6 +939,21 @@ input[type="radio"]:checked + .radio-label::before {
 
 @media (max-width: 801px) {
 
+.small-container {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.delete-btn {
+  right: 0;
+  bottom: 0;
+  top: auto;
+}
+
+.greeting-booking {
+  font-size: 19px;
+}
+
 .attraction-content {
   display: flex;
   justify-content: center;
@@ -809,7 +963,6 @@ input[type="radio"]:checked + .radio-label::before {
   gap: 20px;
   color: rgba(102, 102, 102, 1);
   flex-wrap: wrap;
-  
 }
 
 .pictures img {
@@ -829,10 +982,26 @@ input[type="radio"]:checked + .radio-label::before {
   border-radius: 0;
 }
 
+.booking-picture-content {
+  flex-direction: column;
+  align-items: center;
+}
+
+.booking-picture {
+  width: 100%;
+  height: 200px;
+  background-size: cover;
+}
+
+
 .bookings-content {
   width: 100%;
   font-size: 16px;
   padding: 10px;
+}
+
+.booking-details {
+  height: 200px;
 }
 
 

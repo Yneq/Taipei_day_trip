@@ -3,6 +3,11 @@ from fastapi.responses import FileResponse, JSONResponse
 import mysql.connector
 from mysql.connector import Error
 import json
+from pydantic import BaseModel, EmailStr, validator
+from fastapi.security import OAuth2PasswordBearer
+import datetime
+import jwt
+from fastapi import HTTPException, status
 
 
 app=FastAPI()
@@ -11,20 +16,7 @@ from fastapi.staticfiles import StaticFiles
 
 app=FastAPI()
 
-# from fastapi.middleware.cors import CORSMiddleware
-# origins = [
-#     "http://localhost",
-#     "http://localhost:8000",
-#     "http://13.236.156.145"
-# ]
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=origins, 
-#     allow_credentials=True,
-#     allow_methods=["*"],  
-#     allow_headers=["*"],  
-# )
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Static Pages (Never Modify Code in this Block)
@@ -50,6 +42,131 @@ def get_db():
 		password="244466666",
 		database="tdt"
 	)
+
+
+
+class User(BaseModel):
+	name: str
+	email: EmailStr
+	password: str        
+
+class Token(BaseModel):
+	access_token: str
+	token_type: str
+
+class UserResponse(BaseModel):
+	id: int
+	name: str
+	email: EmailStr
+
+class UserCheckin(BaseModel):
+	email: EmailStr
+	password: str
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+SECRET_KEY = "vance"
+ALGORITHM = "HS256"
+
+async def create_access_token(data: dict, expires_delta: datetime.timedelta = datetime.timedelta(days=7)):
+	to_encode = data.copy()
+	expire = datetime.datetime.utcnow() + expires_delta
+	to_encode.update({"exp":expire})
+	encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+	return encoded_jwt
+
+async def decode_access_token(token: str):
+	try:
+		decoded_token = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+		return decoded_token if decoded_token["exp"] >= datetime.datetime.utcnow().timestamp() else None
+	except jwt.PyJWTError:
+		return None
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+	payload = await decode_access_token(token)
+	if payload is None:
+		raise HTTPException(status_code=401, detail="Invalid or expired token")
+	return payload
+
+
+
+@app.post("/api/user")
+async def create_user(user: User):
+	try:
+		db = get_db()
+		cursor = db.cursor()
+		cursor.execute("SELECT * FROM users WHERE email=%s", (user.email,))
+		existing_user = cursor.fetchone()
+		if existing_user:
+			return JSONResponse(status_code=400, content = {
+				"error": True,
+				"message": "註冊失敗，重複的 Email 或其他原因"
+			})
+		cursor.execute("INSERT INTO users(name, email, password) VALUES (%s, %s, %s)", (user.name, user.email, user.password))
+		db.commit()
+		cursor.close()
+		db.close()
+		return {"ok": True}
+	except Exception as e:
+		print(f"Database error: {str(e)}") 
+		return JSONResponse(status_code=500, content={
+			"error": True,
+			"message": "伺服器內部錯誤"
+		})
+	
+@app.get("/api/user/auth", response_model=UserResponse)
+async def read_user(current_user: dict = Depends(get_current_user)):
+	try:
+		if not current_user:
+			raise HTTPException(status_code=401, detail="Unauthorized")
+
+		db = get_db()
+		cursor = db.cursor()
+		cursor.execute("SELECT id, name, email FROM users WHERE id=%s", (current_user["id"], ))
+		user = cursor.fetchone()
+		cursor.close()
+		db.close()
+
+		if not user:
+			raise HTTPException(status_code=404, detail="User not found")
+		return UserResponse(id=user[0], name=user[1], email=user[2])
+	except Exception as e:
+		print(f"Database error: {str(e)}")
+		raise HTTPException(status_code=500, detail="伺服器內部錯誤")
+		
+@app.put("/api/user/auth")
+async def check_user(user: UserCheckin):
+	try:
+		db = get_db()
+		cursor = db.cursor(dictionary=True)
+		cursor.execute("SELECT * FROM users WHERE email=%s AND password=%s", (user.email, user.password))
+		user_data = cursor.fetchone()
+		cursor.close()
+		db.close()
+		
+		if not user_data:
+			return JSONResponse(status_code=400,content={
+				"error": True,
+				"message": "登入失敗，帳號或密碼錯誤或其他原因"
+			})
+		access_token = await create_access_token(data={
+			"id": user_data["id"],
+			"name": user_data["name"],
+			"email": user_data["email"],
+		})
+		return {"token": access_token}
+		
+	except HTTPException as http_exc:
+		print(f"HTTP Exception: {str(http_exc)}")  # Add logging for debugging
+		return JSONResponse(status_code=http_exc.status_code, content={"error": True, "message": http_exc.detail})
+	except Exception as e:
+		print(f"General Exception: {str(e)}")  # Add logging for debugging
+		return JSONResponse(status_code=500, content={
+			"error": True,
+			"message": f"伺服器內部錯誤: {str(e)}"  # Add detailed error message
+		})
+
 
 @app.get("/api/attractions")
 def attractions(page: int=Query(0, ge=0), keyword: str=None):
