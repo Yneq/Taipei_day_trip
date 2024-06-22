@@ -10,18 +10,67 @@ document.addEventListener('DOMContentLoaded', (event) => {
   const searchInput = document.querySelector('.search-bar input');
   const loader = document.querySelector('.loader');
   const attractionGrid = document.querySelector('.attraction-grid');
-  const leftArrow = document.querySelector('.arrow-left')
-  const rightArrow = document.querySelector('.arrow-right')
-  const morningRadio = document.getElementById('morning')
-  const afternoonRadio = document.getElementById('afternoon')
-  const priceSpan = document.getElementById('price')
-  const titleBtn = document.querySelector('.title')
-  const datePicker = document.querySelector('.date-picker')
-  const datePickerFrame = document.querySelector('.date-picker-frame')
+  const leftArrow = document.querySelector('.arrow-left');
+  const rightArrow = document.querySelector('.arrow-right');
+  const morningRadio = document.getElementById('morning');
+  const afternoonRadio = document.getElementById('afternoon');
+  const priceSpan = document.getElementById('price');
+  const titleBtn = document.querySelector('.title');
+  const datePicker = document.querySelector('.date-picker');
+  const datePickerFrame = document.querySelector('.date-picker-frame');
+  const overlay = document.querySelector('.overlay');
+  const loginRegisterBtn = document.getElementById('login-register-btn');
+  const loginemailInput = document.querySelector('.input-member[name="login-email"]');
+  const loginpasswordInput = document.querySelector('.input-member[name="login-password"]');
+  const failMessage = document.querySelector('.fail-email-password');
+  const failEmailRegisted = document.querySelector('.fail-email-registed')
+  const successSignupMessage = document.querySelector('.success-signup')
+  const successLoginMessage = document.querySelector('.success-login')
+  const signupnameInput = document.querySelector('.input-member[name="signup-name"]');
+  const signupemailInput = document.querySelector('.input-member[name="signup-email"]');
+  const signuppasswordInput = document.querySelector('.input-member[name="signup-password"]');
+  const signupRegisterBtn = document.getElementById('signup-register-btn');
 
-  if(loginBtn) {
+  let isLoggedIn = false;
+
+  function checkLoginStatus() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetch('http://13.236.156.145:8000/api/user/auth', {
+        method: 'GET',
+        headers: {'Authorization': `Bearer ${token}`}
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.id) {
+          isLoggedIn = true;
+          loginBtn.textContent = '登出系統';
+        } else {
+          isLoggedIn = false;
+          loginBtn.textContent = '登入/註冊';
+        }
+      })
+      .catch(error => {
+        isLoggedIn = false;
+        localStorage.removeItem('token');
+        loginBtn.textContent = '登入/註冊';
+      });
+    }
+  }
+  checkLoginStatus();
+
+  if (loginBtn) {
     loginBtn.onclick = function() {
-      modal_login.style.display = "block";
+      if (isLoggedIn) {
+        isLoggedIn = false;
+        localStorage.removeItem('token'); // 删除 token
+        loginBtn.textContent = '登入/註冊';
+        console.log('已登出');
+    
+      } else {
+        modal_login.style.display = "block";
+        overlay.style.display = "block";
+      }
     };
   }
 
@@ -29,6 +78,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     btn.onclick = function () {
     modal_login.style.display = "none";
     modal_signup.style.display = "none";
+    overlay.style.display = "none";
     }
   })
 
@@ -41,6 +91,130 @@ document.addEventListener('DOMContentLoaded', (event) => {
     modal_login.style.display = "block";
     modal_signup.style.display = "none";
   }
+
+  if (loginRegisterBtn) {
+    loginRegisterBtn.addEventListener('click', () => {
+      if (loginemailInput && loginpasswordInput) {
+        const email = loginemailInput.value;
+        const password = loginpasswordInput.value;
+
+        fetch('http://13.236.156.145:8000/api/user/auth', {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            email: email,
+            password: password
+          })
+        })
+        .then(response => {
+          if (response.status === 400) {
+            return response.json();
+          } else if (!response.ok) {
+            throw new Error('登入失敗，請檢查email,password');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+            failMessage.style.display = 'block';
+            setTimeout(() => {
+              failMessage.style.display = 'none';
+            }, 2000);
+            console.log(data.message);
+          } else if (data.token) {
+            localStorage.setItem('token', data.token); // 保存 token 到 localStorage
+            successLoginMessage.style.display = 'block';
+            setTimeout(() => {
+              successLoginMessage.style.display = 'none';
+            }, 2000);
+            console.log('登入成功');
+            isLoggedIn = true;
+            loginBtn.textContent = '登出系統';
+            modal_login.style.display = 'none';
+            overlay.style.display = 'none'; 
+          } else {
+            failMessage.style.display = 'block';
+            setTimeout(() => {
+              failMessage.style.display = 'none';
+            }, 2000);
+            console.log('電子郵件或密碼錯誤');
+          }
+        })
+        .catch(error => {
+          failMessage.style.display = 'block';
+          setTimeout(() => {
+            failMessage.style.display = 'none';
+        }, 2000);
+          console.log('Error', error);
+        });
+      } else {console.log('Email or password input not found');}
+    });
+  }
+  
+  if (signupRegisterBtn) {
+    signupRegisterBtn.addEventListener('click', () => {
+      if (!signupnameInput || !signupemailInput || !signuppasswordInput) {
+        console.log('Email or password input not found');
+        return;
+    }
+
+        const name = signupnameInput.value.trim();
+        const email = signupemailInput.value.trim();
+        const password = signuppasswordInput.value.trim();
+
+        if (!name || !email || !password) {
+            console.log('Some fields are empty');
+            return;
+        }
+
+        console.log({name, email, password});  // for debug
+
+    fetch('http://13.236.156.145:8000/api/user', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            name: name,
+            email: email,
+            password: password
+        })
+    })
+    .then(response => {
+        if (response.status === 422) {
+          return response.json().then(data => {
+            throw new Error(data.message || '註冊失敗，請檢查email,password');
+        });
+    } else if (!response.ok) {
+        throw new Error('註冊失敗，請檢查email,password');
+    }
+    return response.json();
+    })
+    .then(data => {
+        if (data.error) {
+          failEmailRegisted.style.display = 'block';
+            setTimeout(() => {
+              failEmailRegisted.style.display = 'none';
+            }, 2000);
+            console.log(data.message);
+        } else {
+            console.log('註冊成功');
+            successSignupMessage.style.display = 'block';
+            setTimeout(() => {
+                successSignupMessage.style.display = 'none';
+            }, 2000);
+        }
+    })
+    .catch(error => {
+      failEmailRegisted.style.display = 'block';
+        setTimeout(() => {
+          failEmailRegisted.style.display = 'none';
+        }, 2000);
+        console.log('Error', error.message);
+    });
+});
+}
+  
+
+
 
   if (morningRadio) {
     morningRadio.addEventListener('change', () => {
