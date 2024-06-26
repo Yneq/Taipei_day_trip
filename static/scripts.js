@@ -1,32 +1,4 @@
 document.addEventListener('DOMContentLoaded', (event) => {
-  if (window.location.pathname === '/booking') {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      window.location.href = '/';
-      return
-    }
-    fetch('http://13.236.156.145:8000/api/user/auth', {
-      method: 'GET',
-      headers: {'Authorization': `Bearer ${token}`}
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('unauthorized');
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (!data.id) {
-        throw new Error('unauthorized');
-      }
-      fetchBookingData();
-    })
-    .catch(error => {
-      console.error('unauthorized', error);
-      window.location.href = '/';
-    });
-  }
-
   const modal_login = document.getElementById('modal-login');
   const modal_signup = document.getElementById('modal-signup');
   const loginBtn = document.getElementById('loginBtn');
@@ -78,41 +50,50 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 
   let isLoggedIn = false;
+  let userData = null;
 
-  function checkLoginStatus() {
+  function checkLoginStatus(callback) {
     const token = localStorage.getItem('token');
-    if (token) {
-      fetch('http://13.236.156.145:8000/api/user/auth', {
-        method: 'GET',
-        headers: {'Authorization': `Bearer ${token}`}
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.id) {
-          isLoggedIn = true;
-          loginBtn.textContent = '登出系統';
-          if(window.location.pathname === '/booking') {
-            fetchBookingData();
-          }
-        } else {
-          isLoggedIn = false;
-          loginBtn.textContent = '登入/註冊';
-        }
-      })
-      .catch(error => {
-        isLoggedIn = false;
-        localStorage.removeItem('token');
-        loginBtn.textContent = '登入/註冊';
+    if (!token) {
+      isLoggedIn = false;
+      if (window.location.pathname === '/booking') {
         redirectToHomePage();
-      });
+      }
+      return;
     }
+  
+    fetch('http://13.236.156.145:8000/api/user/auth', {
+      method: 'GET',
+      headers: {'Authorization': `Bearer ${token}`}
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.id) {
+        isLoggedIn = true;
+        loginBtn.textContent = '登出系統';
+        userData = data;
+        if (callback) callback();
+      } else {
+        throw new Error('User data not found');
+      }
+    })
+    .catch(error => {
+      console.error('unauthorized', error);
+      localStorage.removeItem('token');
+      isLoggedIn = false;
+      loginBtn.textContent = '登入/註冊';
+      if (window.location.pathname === '/booking') {
+        redirectToHomePage();
+      }
+    });
   }
+  
+  
 
   function redirectToHomePage() {
-    if (window.location.pathname === '/booking') {
-      window.location.href = '/';
-    }
+    window.location.href = '/';
   }
+  
 
   function fetchBookingData() {
     fetch('http://13.236.156.145:8000/api/booking', {
@@ -129,13 +110,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
         bookingTime.textContent = data.time;
         bookingLocation.textContent = data.attraction.address;
         const bookingPrice = data.price;
-        
+  
         bookingPriceElement.forEach(element => {
           element.textContent = bookingPrice;
         })
-
+  
         if (image) bookingPicture.style.backgroundImage = `url(${image})`;
-
+  
         greetingBooking.style.display = 'block';
         notBooking.style.display = 'block';
         greetingNoBooking.style.display = 'none';
@@ -149,6 +130,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
       showNoBookingMessage();
     });
   }
+  
 
   function showNoBookingMessage() {
     greetingBooking.style.display = 'block';
@@ -156,7 +138,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     greetingNoBooking.style.display = 'block';
     copyrightBar.style.height = '865px';
   }
-  checkLoginStatus();
+
 
 
   if (loginBtn) {
@@ -178,7 +160,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   if (bookingBtn) {
     bookingBtn.onclick = function() {
-      if (isLoggedIn) {
+      const token = localStorage.getItem('token')
+      if (token) {
         window.location.href ='http://13.236.156.145:8000/booking'
       } else {
         modal_login.style.display = "block";
@@ -201,7 +184,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
       }
       const selectedDate = new Date(date);
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // 將當前日期設置為當前的零時零分零秒
+      today.setHours(0, 0, 0, 0);
   
       if (selectedDate < today) {
         alert('選擇的日期不能小於今日');
@@ -507,30 +490,16 @@ if (leftArrow && stationsContainer && rightArrow) {
   });
 }
 
-if (bookingNameElement && bookingNmaeInputElement) {
-  const token = localStorage.getItem('token');
-
-  if (!token) {
-    console.error('No token found');
-    return;
+checkLoginStatus(() => {
+  if (window.location.pathname === '/booking') {
+    fetchBookingData();
   }
-  fetch('http://13.236.156.145:8000/api/user/auth', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    bookingNameElement.textContent = data.name;
-    bookingNmaeInputElement.value = data.name;
-    bookingEmailInputElement.value = data.email;
-  })
-  .catch(error => {
-    console.error('Fetching Username Error', error);
-  });
-}
+  if (bookingNameElement && bookingNmaeInputElement) {
+    bookingNameElement.textContent = userData.name;
+    bookingNmaeInputElement.value = userData.name;
+    bookingEmailInputElement.value = userData.email;
+  }
+});
 
 if (deleteBtn) {
   deleteBtn.addEventListener('click', ()=> {
