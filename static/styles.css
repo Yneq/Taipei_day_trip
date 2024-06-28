@@ -186,7 +186,8 @@ opacity: 1;
     background-color: (255, 255, 255, 1);
     transition: transform 0.3s ease;
     overflow-x: scroll;
-    scroll-behavior: smooth; 
+    scroll-behavior: smooth;
+    
 }
 
 .stations::-webkit-scrollbar {
@@ -206,12 +207,12 @@ opacity: 1;
     align-items: center;
     border-radius: 5px;
     color: rgba(102, 102, 102, 1);
-    transition: color 0.3s ease;
+    transition: transform 0.3s ease;
     cursor: pointer;
 }
 
 .station:hover {
-  color: rgba(0, 0, 0, 1);
+  transform: scale(1.5);
 }
 
 .attraction-grid {
@@ -244,6 +245,11 @@ opacity: 1;
   height: 197px;
   object-fit: cover;
   position: relative;
+  transition: transform 0.3s ease;
+}
+
+.attraction img:hover {
+  transform: scale(1.5);
 }
 
 .attraction .info {
@@ -297,10 +303,10 @@ opacity: 1;
   height: 104px;
   display: flex;
   justify-content: center;
-  align-items: center;
   color:rgba(255, 255, 255, 1);
   background-color:rgba(117, 117, 117, 1);
   margin-top: 50px;
+  padding-top: 40px;
   box-sizing: border-box; 
 }
 
@@ -647,6 +653,12 @@ input[type="radio"]:checked + .radio-label::before {
   margin-top: 40px;
   margin-bottom: 30px;
   font-weight: bold;
+  font-size: 19px;
+}
+
+.greeting-no-booking {
+  font-size: 16px;
+  display: none;
 }
 
 .booking-picture-content {
@@ -655,7 +667,6 @@ input[type="radio"]:checked + .radio-label::before {
 }
 
 .booking-picture {
-  background-image: url('welcome.png');
   width:250px;
   height: 200px;
   background-size: cover;
@@ -684,12 +695,14 @@ input[type="radio"]:checked + .radio-label::before {
 .booking-attraction-name {
   margin-bottom: 20px;
   color: rgba(68, 136, 153, 1);
+  font-weight: bold;
 }
 
 .details {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  font-weight: bold;
 }
 
 .input-name, .input-mail, .input-number, .credit-card-input, .input-date, .input-cvv {
@@ -742,7 +755,7 @@ input[type="radio"]:checked + .radio-label::before {
   margin-bottom: 22px;
 }
 
-.fail-email-password, .fail-email-registed {
+.fail-email-password, .fail-email-registed, .fail-registed {
   display: none;
   margin-bottom: 5px;
   color: rgb(164, 11, 11);
@@ -753,6 +766,11 @@ input[type="radio"]:checked + .radio-label::before {
   margin-bottom: 5px;
   color: rgb(11, 164, 95);
 }
+
+.not-booking {
+  display: none;
+}
+
 
 
 

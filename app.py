@@ -8,6 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 import datetime
 import jwt
 from fastapi import HTTPException, status
+from typing import Optional
 
 
 app=FastAPI()
@@ -63,6 +64,28 @@ class UserCheckin(BaseModel):
 	email: EmailStr
 	password: str
 
+class Attraction(BaseModel):
+	id: int
+	name: str
+	address: str
+	image: str
+
+class BookingDataGet(BaseModel):
+	attraction: Attraction
+	date: str
+	time: str
+	price: int
+
+class BookingDataPost(BaseModel):
+	attractionId: int
+	date: str
+	time: str
+	price: int
+
+class ErrorResponse(BaseModel):
+	error: bool
+	message: str 
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -79,6 +102,7 @@ async def create_access_token(data: dict, expires_delta: datetime.timedelta = da
 async def decode_access_token(token: str):
 	try:
 		decoded_token = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+		print(decoded_token)
 		return decoded_token if decoded_token["exp"] >= datetime.datetime.utcnow().timestamp() else None
 	except jwt.PyJWTError:
 		return None
@@ -87,6 +111,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 	payload = await decode_access_token(token)
 	if payload is None:
 		raise HTTPException(status_code=401, detail="Invalid or expired token")
+	print(payload)
 	return payload
 
 
@@ -134,7 +159,7 @@ async def read_user(current_user: dict = Depends(get_current_user)):
 	except Exception as e:
 		print(f"Database error: {str(e)}")
 		raise HTTPException(status_code=500, detail="伺服器內部錯誤")
-		
+
 @app.put("/api/user/auth")
 async def check_user(user: UserCheckin):
 	try:
@@ -158,13 +183,13 @@ async def check_user(user: UserCheckin):
 		return {"token": access_token}
 		
 	except HTTPException as http_exc:
-		print(f"HTTP Exception: {str(http_exc)}")  # Add logging for debugging
+		print(f"HTTP Exception: {str(http_exc)}") 
 		return JSONResponse(status_code=http_exc.status_code, content={"error": True, "message": http_exc.detail})
 	except Exception as e:
-		print(f"General Exception: {str(e)}")  # Add logging for debugging
+		print(f"General Exception: {str(e)}")
 		return JSONResponse(status_code=500, content={
 			"error": True,
-			"message": f"伺服器內部錯誤: {str(e)}"  # Add detailed error message
+			"message": f"伺服器內部錯誤: {str(e)}"
 		})
 
 
@@ -277,3 +302,88 @@ def get_mrts():
 			)
 	mrts_names = [mrt[0] for mrt in mrts]
 	return {"data": mrts_names}
+
+@app.get("/api/booking", response_model=Optional[BookingDataGet], responses={403: {"model": ErrorResponse}})
+async def get_booking(current_user: dict = Depends(get_current_user)):
+	db = get_db()
+	cursor = db.cursor(dictionary=True)
+	try:
+		cursor.execute("""
+				SELECT b.*, a.name, a.address, a.images
+				FROM bookings b
+				JOIN attractions a ON b.attractionId = a.id
+				WHERE b.userId = %s
+		""", (current_user["id"],))
+		booking_data = cursor.fetchone()
+
+		if booking_data:
+			images = json.loads(booking_data["images"])
+			first_image_url = images[0] if images else None
+
+			return {
+				"attraction": {
+					"id": booking_data["attractionId"],
+					"name": booking_data["name"],
+					"address": booking_data["address"],
+					"image": first_image_url
+				},
+				"date": str(booking_data["date"]),
+				"time": booking_data["time"],
+				"price": booking_data["price"]
+			}
+		else:
+			return None
+	except Exception as e:
+		print(f"Database error: {str(e)}")
+		raise HTTPException(status_code=500, detail="伺服器內部錯誤")
+	finally:
+		cursor.close()
+		db.close()
+
+@app.post("/api/booking", responses={
+	200: {"description": "Booking created successfully"},
+    400: {"model": ErrorResponse, "description": "Bad Request"},
+    403: {"model": ErrorResponse, "description": "Forbidden"},
+    500: {"model": ErrorResponse, "description": "Internal Server Error"}
+})
+async def create_booking(bookings: BookingDataPost, current_user: dict = Depends(get_current_user)):
+	print(f"Received booking data: {bookings}")
+	print(f"Current user: {current_user}")
+	db = get_db()
+	cursor = db.cursor()
+	try:
+		cursor.execute("DELETE FROM bookings WHERE userId = %s", (current_user["id"],))
+
+		cursor.execute("INSERT INTO bookings (attractionId, date, time, price, userId) VALUES (%s, %s, %s, %s, %s)",
+		(bookings.attractionId, bookings.date, bookings.time, bookings.price, current_user["id"]))
+		db.commit()
+		return {"description": "Booking created successfully"}
+	except Exception as e:
+		print(f"Database Error: {str(e)}")
+		return JSONResponse(status_code=500, content={
+			"error": True,
+            "message": "伺服器內部錯誤"
+		})
+	finally:
+		cursor.close()
+		db.close()
+
+@app.delete("/api/booking", responses={
+	200: {"description": "Booking deleted successfully", "content": {"application/json": {"example": {"ok": "true"}}}},
+	403: {"model": ErrorResponse}
+	})
+async def celete_booking(current_user: dict = Depends(get_current_user)):
+	db = get_db()
+	cursor = db.cursor()
+	try:
+		cursor.execute("DELETE FROM bookings WHERE userId = %s", (current_user["id"],))
+		db.commit()
+	except Exception as e:
+		print(f"Database Error: {str(e)}")
+		return JSONResponse(status_code=500, content={
+			"error": True,
+            "message": "伺服器內部錯誤"
+		})
+	finally:
+		cursor.close()
+		db.close()

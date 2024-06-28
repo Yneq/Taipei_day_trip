@@ -23,41 +23,123 @@ document.addEventListener('DOMContentLoaded', (event) => {
   const loginemailInput = document.querySelector('.input-member[name="login-email"]');
   const loginpasswordInput = document.querySelector('.input-member[name="login-password"]');
   const failMessage = document.querySelector('.fail-email-password');
-  const failEmailRegisted = document.querySelector('.fail-email-registed')
-  const successSignupMessage = document.querySelector('.success-signup')
-  const successLoginMessage = document.querySelector('.success-login')
+  const failEmailRegisted = document.querySelector('.fail-email-registed');
+  const failRegisted = document.querySelector('.fail-registed');
+  const successSignupMessage = document.querySelector('.success-signup');
+  const successLoginMessage = document.querySelector('.success-login');
   const signupnameInput = document.querySelector('.input-member[name="signup-name"]');
   const signupemailInput = document.querySelector('.input-member[name="signup-email"]');
   const signuppasswordInput = document.querySelector('.input-member[name="signup-password"]');
   const signupRegisterBtn = document.getElementById('signup-register-btn');
+  const bookingNameElement = document.querySelector('.booking-name');
+  const bookingNmaeInputElement = document.querySelector('.input-name');
+  const bookingEmailInputElement = document.querySelector('.input-mail');
+  const bookingBtn = document.getElementById('bookingBtn');
+  const startBookingBtn = document.querySelector('.start-booking-btn')
+  const bookingPicture = document.querySelector('.booking-picture');
+  const copyrightBar = document.querySelector('.copyright-bar');
+  const bookingAttractionName = document.querySelector('.bookingAttractionName');
+  const bookingDate = document.querySelector('.bookingDate'); 
+  const bookingTime = document.querySelector('.bookingTime'); 
+  const bookingPriceElement = document.querySelectorAll('.bookingPrice'); 
+  const bookingLocation = document.querySelector('.bookingLocation');
+  const greetingBooking = document.querySelector('.greeting-booking');
+  const notBooking = document.querySelector('.not-booking');
+  const greetingNoBooking = document.querySelector('.greeting-no-booking');
+  const deleteBtn = document.querySelector('.delete-btn');
+
 
   let isLoggedIn = false;
+  let userData = null;
 
-  function checkLoginStatus() {
+  function checkLoginStatus(callback) {
     const token = localStorage.getItem('token');
-    if (token) {
-      fetch('http://13.236.156.145:8000/api/user/auth', {
-        method: 'GET',
-        headers: {'Authorization': `Bearer ${token}`}
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.id) {
-          isLoggedIn = true;
-          loginBtn.textContent = '登出系統';
-        } else {
-          isLoggedIn = false;
-          loginBtn.textContent = '登入/註冊';
-        }
-      })
-      .catch(error => {
-        isLoggedIn = false;
-        localStorage.removeItem('token');
-        loginBtn.textContent = '登入/註冊';
-      });
+    if (!token) {
+      isLoggedIn = false;
+      if (window.location.pathname === '/booking') {
+        redirectToHomePage();
+      }
+      return;
     }
+  
+    fetch('http://13.236.156.145:8000/api/user/auth', {
+      method: 'GET',
+      headers: {'Authorization': `Bearer ${token}`}
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.id) {
+        isLoggedIn = true;
+        loginBtn.textContent = '登出系統';
+        userData = data;
+        if (callback) callback();
+      } else {
+        throw new Error('User data not found');
+      }
+    })
+    .catch(error => {
+      console.error('unauthorized', error);
+      localStorage.removeItem('token');
+      isLoggedIn = false;
+      loginBtn.textContent = '登入/註冊';
+      if (window.location.pathname === '/booking') {
+        redirectToHomePage();
+      }
+    });
   }
-  checkLoginStatus();
+  
+  
+
+  function redirectToHomePage() {
+    window.location.href = '/';
+  }
+  
+
+  function fetchBookingData() {
+    fetch('http://13.236.156.145:8000/api/booking', {
+      method: 'GET',
+      headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data) {
+        const attraction = data.attraction;
+        const image = attraction.image;
+        bookingAttractionName.textContent = data.attraction.name;
+        bookingDate.textContent = data.date;
+        bookingTime.textContent = data.time;
+        bookingLocation.textContent = data.attraction.address;
+        const bookingPrice = data.price;
+  
+        bookingPriceElement.forEach(element => {
+          element.textContent = bookingPrice;
+        })
+  
+        if (image) bookingPicture.style.backgroundImage = `url(${image})`;
+  
+        greetingBooking.style.display = 'block';
+        notBooking.style.display = 'block';
+        greetingNoBooking.style.display = 'none';
+        copyrightBar.style.height = '104px';
+      } else {
+        showNoBookingMessage();
+      }
+    })
+    .catch(error => {
+      console.log('Error Fetching booking data', error);
+      showNoBookingMessage();
+    });
+  }
+  
+
+  function showNoBookingMessage() {
+    greetingBooking.style.display = 'block';
+    notBooking.style.display = 'none';
+    greetingNoBooking.style.display = 'block';
+    copyrightBar.style.height = '865px';
+  }
+
+
 
   if (loginBtn) {
     loginBtn.onclick = function() {
@@ -66,13 +148,87 @@ document.addEventListener('DOMContentLoaded', (event) => {
         localStorage.removeItem('token'); // 删除 token
         loginBtn.textContent = '登入/註冊';
         console.log('已登出');
-    
+        if (window.location.pathname === '/booking') {
+          window.location.href = '/';
+         } // 重定向到首頁
       } else {
         modal_login.style.display = "block";
         overlay.style.display = "block";
       }
     };
   }
+
+  if (bookingBtn) {
+    bookingBtn.onclick = function() {
+      const token = localStorage.getItem('token')
+      if (token) {
+        window.location.href ='http://13.236.156.145:8000/booking'
+      } else {
+        modal_login.style.display = "block";
+        overlay.style.display = "block";
+      }
+    }
+  }
+
+  if (startBookingBtn) {
+    startBookingBtn.onclick = function() {
+      const date = datePicker.value;
+      const time = morningRadio.checked ? '上午9點到12點' : afternoonRadio.checked ? '下午2點到5點' : null;
+      const price = priceSpan.textContent;
+      const attractionId = window.location.pathname.split('/').pop();  // 在 URL 中包含 attractionId
+      const token = localStorage.getItem('token');
+
+      if (!date || !time) {
+        alert('請選擇日期和時間');
+        return;
+      }
+      const selectedDate = new Date(date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+  
+      if (selectedDate < today) {
+        alert('選擇的日期不能小於今日');
+        return;
+      }
+
+
+      if (!token) {
+        modal_login.style.display = 'block';
+        overlay.style.display = 'block';
+        return;
+      }
+
+      fetch('http://13.236.156.145:8000/api/booking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          attractionId: attractionId,
+          date: date,
+          time: time,
+          price: parseInt(price, 10)
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Booking created successfully', data);
+        window.location.href = '/booking';
+      })
+      .catch(error => {
+        console.error('Error creating booking', error);
+        alert('預定行程失敗');
+      });
+    };
+  }
+
+
 
   closeBtn.forEach(btn => {
     btn.onclick = function () {
@@ -126,12 +282,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
             successLoginMessage.style.display = 'block';
             setTimeout(() => {
               successLoginMessage.style.display = 'none';
+              modal_login.style.display = 'none'; 
+              overlay.style.display = 'none'; 
             }, 2000);
             console.log('登入成功');
             isLoggedIn = true;
             loginBtn.textContent = '登出系統';
-            modal_login.style.display = 'none';
-            overlay.style.display = 'none'; 
+            if (window.location.pathname === '/booking') {
+              fetchBookingData(); // 確保在 booking 頁面時重新加載預訂數據
+            }
           } else {
             failMessage.style.display = 'block';
             setTimeout(() => {
@@ -184,7 +343,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             throw new Error(data.message || '註冊失敗，請檢查email,password');
         });
     } else if (!response.ok) {
-        throw new Error('註冊失敗，請檢查email,password');
+        throw new Error('Email 已經註冊帳戶');
     }
     return response.json();
     })
@@ -204,10 +363,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     })
     .catch(error => {
-      failEmailRegisted.style.display = 'block';
-        setTimeout(() => {
-          failEmailRegisted.style.display = 'none';
-        }, 2000);
+      if (error.message.includes('已經註冊')) {
+        failEmailRegisted.style.display = 'block';
+          setTimeout(() => {
+            failEmailRegisted.style.display = 'none';
+          }, 2000);
+        } else {
+          failRegisted.style.display = 'block';
+          setTimeout(() => {
+            failRegisted.style.display = 'none';
+          }, 2000);
+        }
         console.log('Error', error.message);
     });
 });
@@ -241,7 +407,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
   if (datePicker) {
     datePicker.addEventListener('change', (event) => {
       const selectedDate = event.target.value;
-      console.log(`Date-Choosed: ${selectedDate}`);
     });
   }
 
@@ -307,21 +472,65 @@ if (attractionGrid && loader) {
 
 if (leftArrow && stationsContainer && rightArrow) {
   leftArrow.addEventListener('click', () => {
+    const scrollAmount = stationsContainer.clientWidth * 0.9;
     stationsContainer.scrollBy({
       top: 0, 
-      left: -1000,
+      left: -scrollAmount,
       behavior: 'smooth'
     });
   });
 
   rightArrow.addEventListener('click', () => {
+    const scrollAmount = stationsContainer.clientWidth * 0.9;
     stationsContainer.scrollBy({
       top: 0,
-      left: 1000,
+      left: scrollAmount,
       behavior:'smooth'
     });
   });
 }
+
+checkLoginStatus(() => {
+  if (window.location.pathname === '/booking') {
+    fetchBookingData();
+  }
+  if (bookingNameElement && bookingNmaeInputElement) {
+    bookingNameElement.textContent = userData.name;
+    bookingNmaeInputElement.value = userData.name;
+    bookingEmailInputElement.value = userData.email;
+  }
+});
+
+if (deleteBtn) {
+  deleteBtn.addEventListener('click', ()=> {
+    const token = localStorage.getItem('token'); 
+
+  if (!token) {
+    console.error('No token found');
+    return;
+  }
+  fetch('http://13.236.156.145:8000/api/booking', {
+    method: 'DELETE',
+    headers: {
+      'Content-type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('booking deleted successfully', data)
+    location.reload();
+
+  })
+  .catch(error => {
+    console.error('Error Deleting', error)
+  });
+  });
+}
+
+
+
+
 
 }); //===============尾部
 
