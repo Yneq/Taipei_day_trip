@@ -691,7 +691,23 @@ if (paymentForm) {
         } else {
           const orderNumber = data.data.number;
           alert('付款成功');
-          window.location.href = `/thankyou?order_number=${orderNumber}`;
+
+          fetch('http://13.236.156.145:8000/api/booking', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          })
+          .then(response =>response.json())
+          .then(() => {
+            window.location.href = `/thankyou?order_number=${orderNumber}`;
+          })
+          .catch(error =>{
+            console.log('Delete Error for bookings', error);
+            window.location.href = `/thankyou?order_number=${orderNumber}`;
+          });
+        
         }
       })
       .catch(error => {
