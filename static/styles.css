@@ -705,7 +705,7 @@ input[type="radio"]:checked + .radio-label::before {
   font-weight: bold;
 }
 
-.input-name, .input-mail, .input-number, .credit-card-input, .input-date, .input-cvv {
+.input-name, .input-mail, .input-number, .credit-card-input, .input-date, .input-ccv {
   display: block;
   margin-bottom: 10px;
   width: 100%;
@@ -713,6 +713,15 @@ input[type="radio"]:checked + .radio-label::before {
   border: 1px solid #ccc;
   border-radius: 5px;
   max-width: 200px;
+  max-height: 38px;
+}
+
+.tpfield {
+  height: 40px;
+  width: 300px;
+  border: 1px solid gray;
+  margin: 5px 0;
+  padding: 5px;
 }
 
 .input-group {
@@ -771,8 +780,17 @@ input[type="radio"]:checked + .radio-label::before {
   display: none;
 }
 
+.order-attraction-image {
+  height: 200px;
+  width: 200px;
+}
 
-
+.order-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: space-around;
+  flex-direction: column;
+}
 
 
 
