@@ -84,25 +84,35 @@
   </div>
   <div class="booking-container">
     <div class="creditcard-info">信用卡付款資訊</div>
+    <form id="payment-form">
     <div class="input-group">
-      卡片號碼：<input type="password" placeholder="輸入信用卡號碼" class="credit-card-input">
+      卡片號碼：<div class="credit-card-input tpfield" id="card-number"></div>
     </div>
-    <div class="input-group">過期時間：<input type="text" placeholder="MM/YY" class="input-date"></div>
-    <div class="input-group">驗證密碼：<input type="text" placeholder="CVV" class="input-cvv"></div>
+    <div class="input-group">
+      過期時間：<div class="input-date tpfield" id="card-expiration-date"></div>
+    </div>
+    <div class="input-group">
+      驗證密碼：<div class="input-ccv tpfield" id="card-ccv"></div>  
+      </div>
   </div>
   <div class="horizontal-line-container">
     <div class="horizontal-line"></div>
   </div>
   <div class="booking-container" id="total-price">
     <div>總價：新台幣 <span class="bookingPrice"></span> 元</div>
-    <button class="confirm-pay">確認訂購並付款</button>
+    <button class="confirm-pay" id="pay-button">確認訂購並付款</button>
   </div>
 </div>
+</form>
 </div>
 </div>
 
 <div class="loader"></div>
 <div class="copyright-bar">COPYRIGHT © 2021 台北一日遊</div>
-<script src="static/scripts.js"></script>
+
+  <script src="https://js.tappaysdk.com/tpdirect/v5.13.1"></script>
+  <script>TPDirect.setupSDK(151758, 'app_9xqujZF27RJkyFs78NC2tI718lLlzimlCSDcRKsIkcaRt2lYlrw4KlnkUqFG', 'sandbox')</script>
+  <script src="static/scripts.js"></script>
+
 </body>
 </html>
