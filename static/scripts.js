@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   const bookingNameElement = document.querySelector('.booking-name');
   const bookingNmaeInputElement = document.querySelector('.input-name');
   const bookingEmailInputElement = document.querySelector('.input-mail');
+  const bookingNumberInputElement = document.querySelector('.input-number');
   const bookingBtn = document.getElementById('bookingBtn');
   const startBookingBtn = document.querySelector('.start-booking-btn')
   const bookingPicture = document.querySelector('.booking-picture');
@@ -328,7 +329,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             return;
         }
 
-        console.log({name, email, password});  // for debug
+     //   console.log({name, email, password});  // for debug
 
     fetch('http://13.236.156.145:8000/api/user', {
         method: 'POST',
@@ -530,239 +531,260 @@ if (deleteBtn) {
   });
 }
 
-if (typeof TPDirect !== 'undefined') {
 
-  const fields = {
-  number: {
-      // css selector
-      element: '#card-number',
-      placeholder: '**** **** **** ****'
-  },
-  expirationDate: {
-      // DOM object
-      element: document.getElementById('card-expiration-date'),
-      placeholder: 'MM / YY'
-  },
-  ccv: {
-      element: '#card-ccv',
-      placeholder: 'ccv'
-  }
-};
+//TPDirect 串接
+function initializeTPDirect(){
+  if (typeof TPDirect !== 'undefined') {
 
-TPDirect.card.setup({
-    fields: fields,
-    styles: {
-        'input': {
-            'border': '1px solid #ccc',
-            'border-radius': '5px',
-            'padding': '10px',
-            'width': '100%',
-            'max-width': '200px',
-            'margin-bottom': '10px',
-            'color': 'gray'
-        },
-        ':focus': {
-            'color': 'black'
-        },
-        '.valid': {
-            'color': 'green'
-        },
-        '.invalid': {
-            'color': 'red'
-        },
-        '@media screen and (max-width: 400px)': {
-            'input': {
-                'color': 'orange'
-            }
-        }
+    const fields = {
+    number: {
+        // css selector
+        element: '#card-number',
+        placeholder: '**** **** **** ****'
     },
-    isMaskCreditCardNumber: true,
-    maskCreditCardNumberRange: {
-        beginIndex: 6,
-        endIndex: 11
-    }
-});
-
-TPDirect.card.onUpdate(function (update) {
-  const payButton = document.getElementById('pay-button');
-  if (update.canGetPrime) {
-    payButton.removeAttribute('disabled');
-  } else {
-    payButton.setAttribute('disabled', true);
-  }
-
-  const updateFieldStatus = (field, status) => {
-    if (status === 2) {
-      field.classList.add('invalid');
-    } else if (status === 0) {
-      field.classList.remove('invalid');
-      field.classList.add('valid');
-    } else {
-      field.classList.remove('invalid');
-      field.classList.remove('valid');
+    expirationDate: {
+        // DOM object
+        element: document.getElementById('card-expiration-date'),
+        placeholder: 'MM / YY'
+    },
+    ccv: {
+        element: '#card-ccv',
+        placeholder: 'ccv'
     }
   };
 
-  updateFieldStatus(document.getElementById('card-number'), update.status.number);
-  updateFieldStatus(document.getElementById('card-expiration-date'), update.status.expiry);
-  updateFieldStatus(document.getElementById('card-ccv'), update.status.ccv);
+  TPDirect.card.setup({
+      fields: fields,
+      styles: {
+          'input': {
+              'border': '1px solid #ccc',
+              'border-radius': '5px',
+              'padding': '10px',
+              'width': '100%',
+              'max-width': '200px',
+              'margin-bottom': '10px',
+              'color': 'gray'
+          },
+          ':focus': {
+              'color': 'black'
+          },
+          '.valid': {
+              'color': 'green'
+          },
+          '.invalid': {
+              'color': 'red'
+          },
+          '@media screen and (max-width: 400px)': {
+              'input': {
+                  'color': 'orange'
+              }
+          }
+      },
+      isMaskCreditCardNumber: true,
+      maskCreditCardNumberRange: {
+          beginIndex: 6,
+          endIndex: 11
+      }
+  });
 
-  
-});
-
-
-const paymentForm = document.getElementById('payment-form');
-
-if (paymentForm) {
-  paymentForm.addEventListener('submit', function (event) {
-    event.preventDefault();
-    const tappayStatus = TPDirect.card.getTappayFieldsStatus();
-
-    // console.log('Tappay Fields Status:', tappayStatus);
-    // console.log('Card Number Status:', tappayStatus.status.number);
-    // console.log('Expiry Status:', tappayStatus.status.expiry);
-    // console.log('CCV Status:', tappayStatus.status.ccv);
-
-    if (!tappayStatus.canGetPrime) {
-      alert('信用卡資訊填寫有誤');
-      return;
+  TPDirect.card.onUpdate(function (update) {
+    const payButton = document.getElementById('pay-button');
+    if (update.canGetPrime) {
+      payButton.removeAttribute('disabled');
+    } else {
+      payButton.setAttribute('disabled', true);
     }
 
-    TPDirect.card.getPrime((result) => {
-      if (result.status !== 0) {
-        alert('取得 Prime 失敗：' + result.msg);
+    const updateFieldStatus = (field, status) => {
+      if (status === 2) {
+        field.classList.add('invalid');
+      } else if (status === 0) {
+        field.classList.remove('invalid');
+        field.classList.add('valid');
+      } else {
+        field.classList.remove('invalid');
+        field.classList.remove('valid');
+      }
+    };
+
+    updateFieldStatus(document.getElementById('card-number'), update.status.number);
+    updateFieldStatus(document.getElementById('card-expiration-date'), update.status.expiry);
+    updateFieldStatus(document.getElementById('card-ccv'), update.status.ccv);
+
+  });
+  
+  const payButton = document.getElementById('pay-button');
+
+  if (payButton) {
+    payButton.addEventListener('click', function (event) {
+      event.preventDefault();
+      if (!bookingNumberInputElement.value || !bookingEmailInputElement.value || !bookingNmaeInputElement.value) {
+        alert('請輸入姓名、信箱、手機號碼');
+        return;
+      }
+      // 如果驗證通過，觸發表單提交
+      paymentFormCreditCard.dispatchEvent(new Event('submit'));
+    });
+  }
+
+  const paymentFormCreditCard = document.getElementById('payment-form-creditcard');
+
+  if (paymentFormCreditCard) {
+    paymentFormCreditCard.addEventListener('submit', function (event) {
+      event.preventDefault();
+      const tappayStatus = TPDirect.card.getTappayFieldsStatus();
+
+      // console.log('Tappay Fields Status:', tappayStatus);
+      // console.log('Card Number Status:', tappayStatus.status.number);
+      // console.log('Expiry Status:', tappayStatus.status.expiry);
+      // console.log('CCV Status:', tappayStatus.status.ccv);
+
+      
+
+      if (!tappayStatus.canGetPrime) {
+        alert('信用卡資訊填寫有誤');
         return;
       }
 
-      const prime = result.card.prime;
-      const price = parseInt(document.querySelector('.bookingPrice').textContent, 10);
-      const attractionName = document.querySelector('.bookingAttractionName').textContent;
-      const attractionAddress = document.querySelector('.bookingLocation').textContent;
-      const attractionImage = document.querySelector('.booking-picture').style.backgroundImage.slice(5, -2);
-      const tripDate = document.querySelector('.bookingDate').textContent;
-      const tripTime = document.querySelector('.bookingTime').textContent;
-      const contactName = document.querySelector('.input-name').value;
-      const contactEmail = document.querySelector('.input-mail').value;
-      const contactPhone = document.querySelector('.input-number').value;
+      TPDirect.card.getPrime((result) => {
+        if (result.status !== 0) {
+          alert('取得 Prime 失敗：' + result.msg);
+          return;
+        }
 
-      const requestBody = {
-        prime: prime,
-        order: {
-          price: price,
-          trip: {
-            attraction: {
-              id: attractionId,
-              name: attractionName,
-              address: attractionAddress,
-              image: attractionImage
+        const prime = result.card.prime;
+        const price = parseInt(document.querySelector('.bookingPrice').textContent, 10);
+        const attractionName = document.querySelector('.bookingAttractionName').textContent;
+        const attractionAddress = document.querySelector('.bookingLocation').textContent;
+        const attractionImage = document.querySelector('.booking-picture').style.backgroundImage.slice(5, -2);
+        const tripDate = document.querySelector('.bookingDate').textContent;
+        const tripTime = document.querySelector('.bookingTime').textContent;
+        const contactName = document.querySelector('.input-name').value;
+        const contactEmail = document.querySelector('.input-mail').value;
+        const contactPhone = document.querySelector('.input-number').value;
+
+        const requestBody = {
+          prime: prime,
+          order: {
+            price: price,
+            trip: {
+              attraction: {
+                id: attractionId,
+                name: attractionName,
+                address: attractionAddress,
+                image: attractionImage
+              },
+              date: tripDate,
+              time: tripTime
             },
-            date: tripDate,
-            time: tripTime
-          },
-          contact: {
-            name: contactName,
-            email: contactEmail,
-            phone: contactPhone
-          }
-        }
-      };
-
-      console.log('Request Body:', requestBody);
-
-      fetch('http://13.236.156.145:8000/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(requestBody)
-      })
-      .then(response => {
-        if (!response.ok) {
-          return response.json().then(err => {
-            throw new Error(JSON.stringify(err));
-          });
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data.error) {
-          alert('付款失敗：' + data.message);
-        } else {
-          const orderNumber = data.data.number;
-          alert('付款成功');
-
-          fetch('http://13.236.156.145:8000/api/booking', {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            contact: {
+              name: contactName,
+              email: contactEmail,
+              phone: contactPhone
             }
-          })
-          .then(response =>response.json())
-          .then(() => {
-            window.location.href = `/thankyou?order_number=${orderNumber}`;
-          })
-          .catch(error =>{
-            console.log('Delete Error for bookings', error);
-            window.location.href = `/thankyou?order_number=${orderNumber}`;
-          });
+          }
+        };
         
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('付款失敗：' + error.message);
+        console.log('Request Body:', requestBody);
+
+        fetch('http://13.236.156.145:8000/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify(requestBody)
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => {
+              throw new Error(JSON.stringify(err));
+            });
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+            alert('付款失敗：' + data.message);
+          } else {
+            const orderNumber = data.data.number;
+            alert('付款成功');
+
+            fetch('http://13.236.156.145:8000/api/booking', {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+              }
+            })
+            .then(response =>response.json())
+            .then(() => {
+              window.location.href = `/thankyou?order_number=${orderNumber}`;
+            })
+            .catch(error =>{
+              console.log('Delete Error for bookings', error);
+              window.location.href = `/thankyou?order_number=${orderNumber}`;
+            });
+          
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('付款失敗：' + error.message);
+        });
       });
     });
-  });
+  }
+  }
 }
-} else {
-  console.log('TPDirect 尚未初始化');
+if (window.location.pathname === '/booking') {
+  initializeTPDirect();
 }
 
-const urlParams = new URLSearchParams(window.location.search);
-const orderNumber = urlParams.get('order_number');
+if (window.location.pathname === '/thankyou') {
+  const urlParams = new URLSearchParams(window.location.search);
+  const orderNumber = urlParams.get('order_number');
 
-if (!orderNumber) {
-  console.error("沒有找到訂單號碼");
-  return;
-}
+
+  if (!orderNumber) {
+    console.error("沒有找到訂單號碼");
+    return;
+  }
 
 // 在支付成功後，使用獲取的訂單號碼調用 API
-fetch(`http://13.236.156.145:8000/api/order/${orderNumber}`, {
-  method: 'GET',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('token')}`
-  }
-})
-.then(response => response.json())
-.then(data => {
-  if (data) {
-    const orderDetail = data;
-    console.log("訂單詳情：", orderDetail);
-    
-    // 在前端顯示訂單詳情
-    document.querySelector('.order-number').textContent = orderDetail.number;
-    document.querySelector('.order-price').textContent = orderDetail.price;
-    document.querySelector('.order-attraction-name').textContent = orderDetail.trip.attraction.name;
-    document.querySelector('.order-attraction-address').textContent = orderDetail.trip.attraction.address;
-    document.querySelector('.order-attraction-image').src = orderDetail.trip.attraction.image;
-    document.querySelector('.order-date').textContent = orderDetail.trip.date;
-    document.querySelector('.order-time').textContent = orderDetail.trip.time;
-    document.querySelector('.order-contact-name').textContent = orderDetail.contact.name;
-    document.querySelector('.order-contact-email').textContent = orderDetail.contact.email;
-    document.querySelector('.order-contact-phone').textContent = orderDetail.contact.phone;
-    document.querySelector('.order-status').textContent = orderDetail.status == 1 ? "PAID" : "UNPAID";
-  } else {
-    console.error("無法獲取訂單詳情");
-  }
-})
-.catch(error => {
-  console.error("Error fetching order details:", error);
-});
-
+  fetch(`http://13.236.156.145:8000/api/order/${orderNumber}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data) {
+      const orderDetail = data;
+      console.log("訂單詳情：", orderDetail);
+      
+      // 在前端顯示訂單詳情
+      document.querySelector('.order-number').textContent = orderDetail.number;
+      document.querySelector('.order-price').textContent = orderDetail.price;
+      document.querySelector('.order-attraction-name').textContent = orderDetail.trip.attraction.name;
+      document.querySelector('.order-attraction-address').textContent = orderDetail.trip.attraction.address;
+      document.querySelector('.order-attraction-image').src = orderDetail.trip.attraction.image;
+      document.querySelector('.order-date').textContent = orderDetail.trip.date;
+      document.querySelector('.order-time').textContent = orderDetail.trip.time;
+      document.querySelector('.order-contact-name').textContent = orderDetail.contact.name;
+      document.querySelector('.order-contact-email').textContent = orderDetail.contact.email;
+      document.querySelector('.order-contact-phone').textContent = orderDetail.contact.phone;
+      document.querySelector('.order-status').textContent = orderDetail.status == 1 ? "PAID" : "UNPAID";
+    } else {
+      console.error("無法獲取訂單詳情");
+    }
+  })
+  .catch(error => {
+    console.error("Error fetching order details:", error);
+  });
+}
   
 
 
