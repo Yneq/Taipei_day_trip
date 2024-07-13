@@ -60,6 +60,8 @@ body {
   width: 84px;
   background-color: rgba(255, 255, 255, 1);
   cursor: pointer;
+  white-space: nowrap; /* Prevent text from wrapping */
+  justify-content: center; /* Center the text horizontally */
 }
 
 .booking-btn:first-child {
@@ -229,7 +231,7 @@ opacity: 1;
 .attraction {
   width: 270px;
   height: 242px;
-  border-radius: 5px;
+  border-radius: 15px;
   border: 1px solid rgba(232, 232, 232, 1);
   display: flex;
   flex-direction: column;
@@ -672,6 +674,7 @@ input[type="radio"]:checked + .radio-label::before {
   background-size: cover;
   margin-right: 8px;
   margin-left: 8px;
+  border-radius: 5px;
 }
 
 .booking-details {
@@ -763,6 +766,8 @@ input[type="radio"]:checked + .radio-label::before {
   height: 36px;
   margin-top: 22px;
   margin-bottom: 22px;
+  white-space: nowrap; /* Prevent text from wrapping */
+  justify-content: center; /* Center the text horizontally */
 }
 
 .fail-email-password, .fail-email-registed, .fail-registed {
@@ -784,6 +789,7 @@ input[type="radio"]:checked + .radio-label::before {
 .order-attraction-image {
   height: 200px;
   width: 200px;
+  border-radius: 15px;
 }
 
 .order-details {
