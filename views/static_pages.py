@@ -15,3 +15,7 @@ async def booking(request: Request):
 @router.get("/thankyou", include_in_schema=False)
 async def thankyou(request: Request):
 	return FileResponse("./static/thankyou.html", media_type="text/html")
+
+@router.get("/board", include_in_schema=False)
+async def thankyou(request: Request):
+	return FileResponse("./static/board.html", media_type="text/html")

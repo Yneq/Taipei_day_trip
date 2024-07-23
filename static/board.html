@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>發表一篇文章</title>
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        textarea {
+            height: 100px;
+            width: 100%;
+        }
+        #imagePreview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+        }
+        .message {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        .message img {
+            max-width: 100%;
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <h1>發表一篇文章</h1>
+    <form id="postForm">
+        <textarea id="textInput" placeholder="輸入文字內容"></textarea>
+        <input type="file" id="imageInput" accept="image/*">
+        <button type="submit">發送</button>
+    </form>
+    <img id="imagePreview" style="display: none;">
+    <div id="messages"></div>
+
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('postForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const text = document.getElementById('textInput').value;
+            const imageFile = document.getElementById('imageInput').files[0];
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            const textP = document.createElement('p');
+            textP.textContent = text;
+            messageDiv.appendChild(textP);
+            
+            if (imageFile) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(imageFile);
+                messageDiv.appendChild(img);
+            }
+            
+            document.getElementById('messages').prepend(messageDiv);
+            
+            // 清空表單
+            e.target.reset();
+            document.getElementById('imagePreview').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
