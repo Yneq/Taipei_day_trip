@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
       return;
     }
   
-    fetch('http://13.236.156.145/api/user/auth', {
+    fetch('/api/user/auth', {
       method: 'GET',
       headers: {'Authorization': `Bearer ${token}`}
     })
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   
 
   function fetchBookingData() {
-    fetch('http://13.236.156.145/api/booking', {
+    fetch('/api/booking', {
       method: 'GET',
       headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}
     })
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     bookingBtn.onclick = function() {
       const token = localStorage.getItem('token')
       if (token) {
-        window.location.href ='http://13.236.156.145/booking'
+        window.location.href ='/booking'
       } else {
         modal_login.style.display = "block";
         overlay.style.display = "block";
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         return;
       }
 
-      fetch('http://13.236.156.145/api/booking', {
+      fetch('/api/booking', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const email = loginemailInput.value;
         const password = loginpasswordInput.value;
 
-        fetch('http://13.236.156.145/api/user/auth', {
+        fetch('/api/user/auth', {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
      //   console.log({name, email, password});  // for debug
 
-    fetch('http://13.236.156.145/api/user', {
+    fetch('/api/user', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   }
 
   titleBtn.onclick = function () {
-    window.location.href ='http://13.236.156.145/'
+    window.location.href ='/'
   };
 
   if (datePickerFrame) {
@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 
   if (stationsContainer) {
-    fetch('http://13.236.156.145/api/mrts')
+    fetch('/api/mrts')
       .then(response => response.json())
       .then(data => {
         const stationNames = data.data
@@ -512,7 +512,7 @@ if (deleteBtn) {
     console.error('No token found');
     return;
   }
-  fetch('http://13.236.156.145/api/booking', {
+  fetch('/api/booking', {
     method: 'DELETE',
     headers: {
       'Content-type': 'application/json',
@@ -687,7 +687,7 @@ function initializeTPDirect(){
         
         console.log('Request Body:', requestBody);
 
-        fetch('http://13.236.156.145/api/orders', {
+        fetch('/api/orders', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -710,7 +710,7 @@ function initializeTPDirect(){
             const orderNumber = data.data.number;
             alert('付款成功');
 
-            fetch('http://13.236.156.145/api/booking', {
+            fetch('/api/booking', {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json',
@@ -752,7 +752,7 @@ if (window.location.pathname === '/thankyou') {
   }
 
 // 在支付成功後，使用獲取的訂單號碼調用 API
-  fetch(`http://13.236.156.145/api/order/${orderNumber}`, {
+  fetch(`/api/order/${orderNumber}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -798,7 +798,7 @@ function fetchAttractions(page, isSearch = false, keyword = '') {
   const attractionGrid = document.querySelector('.attraction-grid');
   if (isloading) return;
     isloading = true;
-    fetch(`http://13.236.156.145/api/attractions?page=${page}&keyword=${keyword}`)
+    fetch(`/api/attractions?page=${page}&keyword=${keyword}`)
       .then(response => response.json())
       .then(data => {
         const attractions = data.data;
@@ -862,7 +862,7 @@ document.addEventListener('DOMContentLoaded', async() => {
     const attractionIdMatch = url.match(/\/attraction\/(\d+)/);
     if (attractionIdMatch) {
       const attractionId = attractionIdMatch[1];    
-      const response = await fetch(`http://13.236.156.145/api/attraction/${attractionId}`)
+      const response = await fetch(`/api/attraction/${attractionId}`)
       const data = await response.json();
       const attraction = data.data;
     

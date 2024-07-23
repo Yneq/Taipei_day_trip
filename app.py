@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from views import static_pages
 from controllers import user_controller, attraction_controller, booking_controller, order_controller
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
