@@ -4,21 +4,21 @@ from mysql.connector import pooling
 import datetime
 import jwt
 from fastapi import HTTPException, Depends
+from dotenv import load_dotenv
+import os
 
-
-
-
+load_dotenv() 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-SECRET_KEY = "vance"
-ALGORITHM = "HS256"
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
 
 
 db_config = {
 	"user": "root",
 	"host": "localhost",
-	"password": "244466666",
+	"password": os.getenv("DB_PASSWORD"),
 	"database": "tdt"
 }
 
