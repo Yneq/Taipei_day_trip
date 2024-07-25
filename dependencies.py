@@ -15,18 +15,18 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 
 
-db_config = {
-	"user": "root",
-	"host": "localhost",
-	"password": os.getenv("DB_PASSWORD"),
-	"database": "tdt"
+rds_db_config = {
+	"user": os.getenv("DB_USER"),
+	"host": os.getenv("RDS_HOST"),
+	"password": os.getenv("RDS_PASSWORD"),
+	"database": os.getenv("DB_NAME")
 }
 
 # 建立 MySQL 連接池
 pool = pooling.MySQLConnectionPool(
 	pool_name = "mypool",
 	pool_size = 10,
-	**db_config
+	**rds_db_config
 )
 
 def get_db():
