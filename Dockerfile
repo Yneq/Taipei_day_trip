@@ -1,8 +1,10 @@
-# 使用官方的Python運行時作為父鏡像
 FROM --platform=linux/amd64 python:3.12-slim
 
 # 設置工作目錄
 WORKDIR /app
+
+# 安裝 Nginx、Redis、curl 和調試工具
+RUN apt-get update && apt-get install -y nginx redis-server curl procps net-tools
 
 # 將當前目錄的內容複製到容器中的/app
 COPY . /app
@@ -10,11 +12,24 @@ COPY . /app
 # 安裝任何需要的包
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# 使容器在運行時監聽在80端口
-EXPOSE 8080
+# 複製 Nginx 配置文件
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# 定義環境變量
-ENV NAME=World
+# 確保移除默認的 default 文件
+RUN rm -f /etc/nginx/sites-enabled/default
 
-# 運行app.py，當容器啟動時
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
+# 創建靜態文件目錄
+RUN mkdir -p /home/ubuntu/Taipei_day_trip/static/
+
+# 暴露端口
+EXPOSE 80 8080 6379
+
+# 創建並設置啟動腳本
+RUN echo '#!/bin/bash\n\
+nginx\n\
+service redis-server start\n\
+uvicorn app:app --host 0.0.0.0 --port 8080\n\
+' > /app/start.sh && chmod +x /app/start.sh
+
+# 運行啟動腳本
+CMD ["/app/start.sh"]
