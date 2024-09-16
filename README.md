@@ -38,7 +38,7 @@ Taipei Day Trip is a platform designed to help users discover and book attractio
 
 ### Backend
 - Python
-- FastAPI (with RESTful API)
+- FastAPI
 - MySQL
 - MVC-style architecture
 
