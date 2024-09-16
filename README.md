@@ -41,6 +41,7 @@ Taipei Day Trip is a platform designed to help users discover and book attractio
 - FastAPI
 - MySQL
 - MVC-style architecture
+- MySQL Connection Pool
 
 ### Authentication
 - JWT (JSON Web Tokens)
